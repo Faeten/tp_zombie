@@ -24,6 +24,13 @@
             "infecte": false,
             "variant": 3,
             "social": []
+          },
+          {
+            "nom": "Pierre",
+            "age": 26,
+            "infecte": false,
+            "variant": 0,
+            "social": []
           }
         ]
       },

@@ -86,9 +86,14 @@ function propagerZombieC(personneContamine: Personne, personnes: Personne[]): vo
         const parent = trouverAscendant(personneContamine, personne);
         if(parent)
         {
+            let contaminer = true;
             for(const personne of parent.social)
             {
-                propager(personne, personnes);
+                if(contaminer)
+                {
+                    propager(personne, personnes);
+                }
+                contaminer=!contaminer;
             }
             break;
         }
