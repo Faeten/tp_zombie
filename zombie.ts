@@ -74,8 +74,25 @@ function propagerZombie32(personne: Personne, personnes: Personne[]): void {
     console.log(personne.nom + " n'a pas le zombie-32 !");
 }
 
-function propagerZombieC(personne: Personne, personnes: Personne[]): void {
-    const parent = trouverAscendant(personne, personne);
+function propagerZombieC(personneContamine: Personne, personnes: Personne[]): void {
+    if (!personneContamine || personneContamine.infecte) {
+        return;
+    }
+
+    personneContamine.infecte = true;
+    console.log(personneContamine.nom + " a le zombie-C !");
+    for (const personne of personnes)
+    {
+        const parent = trouverAscendant(personneContamine, personne);
+        if(parent)
+        {
+            for(const personne of parent.social)
+            {
+                propager(personne, personnes);
+            }
+            break;
+        }
+    }
 }
 
 function propagerZombieUltime(personne: Personne, personnes: Personne[]): void {
@@ -109,19 +126,19 @@ function trouverAscendant(personneCherche: Personne, personne: Personne): Person
     return null
 }
 
-function obtenirAscendants(personneCherche: Personne, arbre: Personne[]): Personne[] | null {
-    if (!arbre || arbre.length === 0) {
+function obtenirAscendants(personneCherche: Personne, personnes: Personne[]): Personne[] | null {
+    if (!personnes || personnes.length === 0) {
         return null;
     }
 
     const ascendants: Personne[] = [];
 
-    for (const personne of arbre) {
+    for (const personne of personnes) {
         const parentTrouve = trouverAscendant(personneCherche, personne);
 
         if (parentTrouve) {
             ascendants.push(parentTrouve);
-            const ascendantsDuParent = obtenirAscendants(parentTrouve, arbre);
+            const ascendantsDuParent = obtenirAscendants(parentTrouve, personnes);
             if (ascendantsDuParent) {
                 ascendants.push(...ascendantsDuParent);
             }
@@ -133,12 +150,12 @@ function obtenirAscendants(personneCherche: Personne, arbre: Personne[]): Person
     return ascendants.length > 0 ? ascendants : null;
 }
 
-function obtenirParent(personne: Personne, arbre: Personne[]): Personne | null {
-    if (!arbre || arbre.length === 0) {
+function obtenirParent(personne: Personne, personnes: Personne[]): Personne | null {
+    if (!personnes || personnes.length === 0) {
         return null;
     }
 
-    for (const parent of arbre) {
+    for (const parent of personnes) {
         if (parent.social && parent.social.includes(personne)) {
             return parent;
         } else {

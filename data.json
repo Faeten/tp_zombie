@@ -22,7 +22,7 @@
             "nom": "Eva",
             "age": 35,
             "infecte": false,
-            "variant": 1,
+            "variant": 3,
             "social": []
           }
         ]
