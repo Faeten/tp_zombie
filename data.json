@@ -1,0 +1,62 @@
+[
+  {
+    "nom": "Alice",
+    "age": 25,
+    "infecte": false,
+    "variant": 4,
+    "social": [
+      {
+        "nom": "Bob",
+        "age": 30,
+        "infecte": false,
+        "variant": 0,
+        "social": [
+          {
+            "nom": "David",
+            "age": 28,
+            "infecte": false,
+            "variant": 0,
+            "social": []
+          },
+          {
+            "nom": "Eva",
+            "age": 35,
+            "infecte": false,
+            "variant": 1,
+            "social": []
+          }
+        ]
+      },
+      {
+        "nom": "Charlie",
+        "age": 22,
+        "infecte": false,
+        "variant": 0,
+        "social": [
+          {
+            "nom": "Frank",
+            "age": 40,
+            "infecte": false,
+            "variant": 0,
+            "social": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "nom": "John",
+    "age": 28,
+    "infecte": false,
+    "variant": 2,
+    "social": [
+      {
+        "nom": "Mary",
+        "age": 35,
+        "infecte": false,
+        "variant": 1,
+        "social": []
+      }
+    ]
+  }
+]
