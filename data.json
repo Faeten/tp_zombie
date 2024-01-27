@@ -4,18 +4,21 @@
     "age": 25,
     "infecte": false,
     "variant": 4,
+    "immunise": false,
     "social": [
       {
         "nom": "Bob",
         "age": 30,
         "infecte": false,
         "variant": 0,
+        "immunise": false,
         "social": [
           {
             "nom": "David",
             "age": 28,
             "infecte": false,
             "variant": 0,
+            "immunise": false,
             "social": []
           },
           {
@@ -23,6 +26,7 @@
             "age": 35,
             "infecte": false,
             "variant": 3,
+            "immunise": false,
             "social": []
           },
           {
@@ -30,6 +34,7 @@
             "age": 26,
             "infecte": false,
             "variant": 0,
+            "immunise": false,
             "social": []
           }
         ]
@@ -39,12 +44,14 @@
         "age": 22,
         "infecte": false,
         "variant": 0,
+        "immunise": false,
         "social": [
           {
             "nom": "Frank",
             "age": 40,
             "infecte": false,
             "variant": 0,
+            "immunise": false,
             "social": []
           }
         ]
@@ -56,12 +63,14 @@
     "age": 28,
     "infecte": false,
     "variant": 2,
+    "immunise": false,
     "social": [
       {
         "nom": "Mary",
         "age": 35,
         "infecte": false,
         "variant": 1,
+        "immunise": false,
         "social": []
       }
     ]

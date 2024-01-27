@@ -233,7 +233,7 @@ function administrerVaccin(personne: Personne): Personne {
 }
 
 function administrerVaccins(personne: Personne): Personne {
-    if(personne.infecte) administrerVaccin(personne);
+    personne = personne.infecte ? administrerVaccin(personne) : personne;
 
     const descendantsVaccines = personne.social.map(administrerVaccins);
 
