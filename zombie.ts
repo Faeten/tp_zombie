@@ -12,14 +12,16 @@ class Personne {
     nom: string;
     age: number;
     infecte: boolean;
+    immunise: boolean;
     variant: Variants;
     social: Personne[];
     constructor(nom: string, age: number, infecte: boolean, variant: Variants, social: Personne[]) {
-    this.nom = nom;
-    this.age = age;
-    this.infecte = infecte;
-    this.variant = variant;
-    this.social = social;
+        this.nom = nom;
+        this.age = age;
+        this.infecte = infecte;
+        this.variant = variant;
+        this.social = social;
+        this.immunise = false;
     }
 }
 
@@ -147,10 +149,9 @@ function obtenirAscendants(personneCherche: Personne, personnes: Personne[]): Pe
             if (ascendantsDuParent) {
                 ascendants.push(...ascendantsDuParent);
             }
-            break;  // parent trouvé
+            break;
         }
     }
-
 
     return ascendants.length > 0 ? ascendants : null;
 }
@@ -204,6 +205,41 @@ function propager(personne: Personne, personnes: Personne[]): void {
     }
 }
 
+function administrerVaccin(personne: Personne): Personne {
+    switch (personne.variant) {
+        case Variants.ZOMBIE_A:
+        case Variants.ZOMBIE_32:
+            if (personne.age >= 0 && personne.age <= 30) {
+                console.log(`${personne.nom} a reçu le Vaccin-A.1`);
+                return { ...personne, infecte: false, immunise: true };
+            }
+            return personne;
+        case Variants.ZOMBIE_B:
+        case Variants.ZOMBIE_C:
+            if (Math.random() < 0.5) {
+                console.log(`${personne.nom} a reçu le Vaccin-B.1`);
+                return { ...personne, infecte: false };
+            } else {
+                console.log(`${personne.nom} est morte`);
+                return personne;
+            }
+        case Variants.ZOMBIE_ULTIME:
+            console.log(`${personne.nom} a reçu le Vaccin-Ultime`);
+            return { ...personne, immunise: true };
+        default:
+            console.error('Variant non géré');
+            return personne;
+    }
+}
+
+function administrerVaccins(personne: Personne): Personne {
+    if(personne.infecte) administrerVaccin(personne);
+
+    const descendantsVaccines = personne.social.map(administrerVaccins);
+
+    return { ...personne, social: descendantsVaccines };
+}
+
 fs.readFile('data.json', 'utf8', (err, data) => {
     if (err) {
         console.error('Erreur lors de la lecture du fichier :', err);
@@ -213,30 +249,11 @@ fs.readFile('data.json', 'utf8', (err, data) => {
     const personnes: Personne[] = JSON.parse(data) as Personne[];
 
     //Infection des patients zeros en dur
-    const patientsZero: Personne[] = [];
-    //patientsZero.push(personnes[1].social[0]); //Mary
-    patientsZero.push(personnes[0].social[0].social[1]); //Eva
+    const patientsZero: Personne[] = [
+        personnes[1].social[0], // Mary
+        personnes[0].social[0].social[1] // Eva
+    ];
 
     initialiserInfection(patientsZero, personnes);
-    // Trouver la personne Eva dans l'arbre
-    const eva = personnes[0].social[0].social[1];
-
-    // Vérifier si Eva a été trouvée
-    if (eva) {
-        // Utiliser la fonction obtenirAscendants pour obtenir tous les ascendants d'Eva
-        const ascendantsEva = obtenirAscendants(eva, personnes);
-
-        // Afficher les noms des ascendants d'Eva
-        if (ascendantsEva) {
-            const nomsAscendants = ascendantsEva.map((p) => p.nom);
-            console.log(`Les ascendants d'Eva sont : ${nomsAscendants.join(', ')}`);
-        } else {
-            console.log('Eva n\'a pas d\'ascendants.');
-        }
-    } else {
-        console.log('Eva n\'a pas été trouvée dans l\'arbre.');
-    }
-
-
-    console.log(JSON.stringify(personnes, null, 2));
+    personnes.map(administrerVaccins);
 });
