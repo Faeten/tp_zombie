@@ -117,20 +117,31 @@ function propagerZombieUltime(personne: Personne, personnes: Personne[]): void {
     }
 }
 
-function trouverAscendant(personneCherche: Personne, personne: Personne): Personne | null
+function trouverAscendant(personneCherche: Personne, personne: Personne,
+                          cache: Map<Personne, Personne | null> = new Map()): Personne | null
 {
-    for (let personneDuGroupe of personne.social) {
-        if (personneCherche == personneDuGroupe) {
+    if (cache.has(personne)) {
+        return cache.get(personne);
+    }
+    for (let personneDuGroupe of personne.social)
+    {
+        if (personneCherche == personneDuGroupe)
+        {
+            cache.set(personne, personne);
             return personne;
         }
-        if (personneDuGroupe.social.length > 0) {
-            let personneTrouve = trouverAscendant(personneCherche, personneDuGroupe);
-            if (personneTrouve) {
+        if (personneDuGroupe.social.length > 0)
+        {
+            let personneTrouve = trouverAscendant(personneCherche, personneDuGroupe, cache);
+            if (personneTrouve)
+            {
+                cache.set(personne, personneTrouve);
                 return personneTrouve;
             }
         }
     }
-    return null
+    cache.set(personne, null);
+    return null;
 }
 
 function obtenirAscendants(personneCherche: Personne, personnes: Personne[]): Personne[] | null {
