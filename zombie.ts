@@ -25,6 +25,33 @@ class Personne {
     }
 }
 
+class Maybe<T> {
+    private readonly value: T | null;
+
+    private constructor(value: T | null) {
+        this.value = value;
+    }
+
+    static of<T>(value: T | null) {
+        return new Maybe<T>(value);
+    }
+
+    isNothing() {
+        return this.value === null || this.value === undefined;
+    }
+
+    isSomething() {
+        return !this.isNothing();
+    }
+
+    get(): T {
+        if (!this.value) {
+            throw new Error();
+        }
+        return this.value;
+    }
+}
+
 function propagerZombieA(personne: Personne, personnes: Personne[]): void {
     if (!personne || personne.infecte) {
         return;
@@ -86,10 +113,10 @@ function propagerZombieC(personneContamine: Personne, personnes: Personne[]): vo
     for (const personne of personnes)
     {
         const parent = trouverAscendant(personneContamine, personne);
-        if(parent)
+        if(parent.isSomething())
         {
             let contaminer = true;
-            for(const personne of parent.social)
+            for(const personne of parent.get().social)
             {
                 if(contaminer)
                 {
@@ -117,31 +144,33 @@ function propagerZombieUltime(personne: Personne, personnes: Personne[]): void {
     }
 }
 
-function trouverAscendant(personneCherche: Personne, personne: Personne,
-                          cache: Map<Personne, Personne | null> = new Map()): Personne | null
+function trouverAscendant(personneCherche: Personne, personne: Personne, cache: Map<Personne,
+    Maybe<Personne>> = new Map()): Maybe<Personne>
 {
     if (cache.has(personne)) {
-        return cache.get(personne);
+        return cache.get(personne) as Maybe<Personne>;
     }
-    for (let personneDuGroupe of personne.social)
+    for (const personneDuGroupe of personne.social)
     {
-        if (personneCherche == personneDuGroupe)
+        if (personneCherche === personneDuGroupe)
         {
-            cache.set(personne, personne);
-            return personne;
+            const maybePersonne = Maybe.of(personne);
+            cache.set(personne, maybePersonne);
+            return maybePersonne;
         }
+
         if (personneDuGroupe.social.length > 0)
         {
-            let personneTrouve = trouverAscendant(personneCherche, personneDuGroupe, cache);
-            if (personneTrouve)
-            {
-                cache.set(personne, personneTrouve);
-                return personneTrouve;
+            const maybePersonneTrouve = trouverAscendant(personneCherche, personneDuGroupe, cache);
+            if (maybePersonneTrouve.isSomething()) {
+                cache.set(personne, maybePersonneTrouve);
+                return maybePersonneTrouve;
             }
         }
     }
-    cache.set(personne, null);
-    return null;
+    const maybeNull = Maybe.of<Personne>(null);
+    cache.set(personne, maybeNull);
+    return maybeNull;
 }
 
 function obtenirAscendants(personneCherche: Personne, personnes: Personne[]): Personne[] | null {
