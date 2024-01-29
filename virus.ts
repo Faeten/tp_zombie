@@ -1,29 +1,4 @@
-import * as fs from 'fs';
-
-enum Variants {
-    ZOMBIE_A,
-    ZOMBIE_B,
-    ZOMBIE_32,
-    ZOMBIE_C,
-    ZOMBIE_ULTIME
-}
-
-class Personne {
-    nom: string;
-    age: number;
-    infecte: boolean;
-    immunise: boolean;
-    variant: Variants;
-    social: Personne[];
-    constructor(nom: string, age: number, infecte: boolean, variant: Variants, social: Personne[]) {
-        this.nom = nom;
-        this.age = age;
-        this.infecte = infecte;
-        this.variant = variant;
-        this.social = social;
-        this.immunise = false;
-    }
-}
+import {Personne, Variants} from "./personnes";
 
 class Maybe<T> {
     private readonly value: T | null;
@@ -76,10 +51,8 @@ function propagerZombieB(personne: Personne, personnes: Personne[]): void {
     console.log(personne.nom + " a le zombie-B !");
 
     const socialAscendants = obtenirAscendants(personne, personnes);
-    if(socialAscendants)
-    {
-        for (const contact of socialAscendants)
-        {
+    if (socialAscendants) {
+        for (const contact of socialAscendants) {
             propager(contact, personnes);
         }
     }
@@ -110,8 +83,7 @@ function propagerZombieC(personneContamine: Personne, personnes: Personne[]): vo
 
     personneContamine.infecte = true;
     console.log(personneContamine.nom + " a le zombie-C !");
-    for (const personne of personnes)
-    {
+    for (const personne of personnes) {
         const parent = trouverAscendant(personneContamine, personne);
         if(parent.isSomething())
         {
@@ -122,7 +94,7 @@ function propagerZombieC(personneContamine: Personne, personnes: Personne[]): vo
                 {
                     propager(personne, personnes);
                 }
-                contaminer=!contaminer;
+                contaminer = !contaminer;
             }
             break;
         }
@@ -183,9 +155,9 @@ function obtenirAscendants(personneCherche: Personne, personnes: Personne[]): Pe
     for (const personne of personnes) {
         const parentTrouve = trouverAscendant(personneCherche, personne);
 
-        if (parentTrouve) {
-            ascendants.push(parentTrouve);
-            const ascendantsDuParent = obtenirAscendants(parentTrouve, personnes);
+        if (parentTrouve.isSomething()) {
+            ascendants.push(parentTrouve.get());
+            const ascendantsDuParent = obtenirAscendants(parentTrouve.get(), personnes);
             if (ascendantsDuParent) {
                 ascendants.push(...ascendantsDuParent);
             }
@@ -216,7 +188,7 @@ function obtenirParent(personne: Personne, personnes: Personne[]): Personne | nu
     return null;
 }
 
-function initialiserInfection(patientsZero: Personne[], personnes: Personne[]): void {
+export function initialiserInfection(patientsZero: Personne[], personnes: Personne[]): void {
     for (const patientZero of patientsZero) {
         propager(patientZero, personnes);
     }
@@ -244,56 +216,3 @@ function propager(personne: Personne, personnes: Personne[]): void {
             break;
     }
 }
-
-function administrerVaccin(personne: Personne): Personne {
-    switch (personne.variant) {
-        case Variants.ZOMBIE_A:
-        case Variants.ZOMBIE_32:
-            if (personne.age >= 0 && personne.age <= 30) {
-                console.log(`${personne.nom} a reçu le Vaccin-A.1`);
-                return { ...personne, infecte: false, immunise: true };
-            }
-            return personne;
-        case Variants.ZOMBIE_B:
-        case Variants.ZOMBIE_C:
-            if (Math.random() < 0.5) {
-                console.log(`${personne.nom} a reçu le Vaccin-B.1`);
-                return { ...personne, infecte: false };
-            } else {
-                console.log(`${personne.nom} est morte`);
-                return personne;
-            }
-        case Variants.ZOMBIE_ULTIME:
-            console.log(`${personne.nom} a reçu le Vaccin-Ultime`);
-            return { ...personne, immunise: true };
-        default:
-            console.error('Variant non géré');
-            return personne;
-    }
-}
-
-function administrerVaccins(personne: Personne): Personne {
-    personne = personne.infecte ? administrerVaccin(personne) : personne;
-
-    const descendantsVaccines = personne.social.map(administrerVaccins);
-
-    return { ...personne, social: descendantsVaccines };
-}
-
-fs.readFile('data.json', 'utf8', (err, data) => {
-    if (err) {
-        console.error('Erreur lors de la lecture du fichier :', err);
-        return;
-    }
-
-    const personnes: Personne[] = JSON.parse(data) as Personne[];
-
-    //Infection des patients zeros en dur
-    const patientsZero: Personne[] = [
-        personnes[1].social[0], // Mary
-        personnes[0].social[0].social[1] // Eva
-    ];
-
-    initialiserInfection(patientsZero, personnes);
-    personnes.map(administrerVaccins);
-});
